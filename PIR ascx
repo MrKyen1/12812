@@ -1,0 +1,984 @@
+<%@ Control Language="C#" AutoEventWireup="true" CodeFile="PIRIssue.ascx.cs" Inherits="View_PIR_PIRIssue" %>
+<%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="asp" %>
+<link href="../../Content/TVP.css" rel="stylesheet" type="text/css" />
+<link href="../../Content/PIR.css" rel="stylesheet" type="text/css" />
+<div id="background" class="manche"></div>
+<asp:Panel runat="server" DefaultButton="btNext">
+    <asp:ScriptManager ID="ToolkitScriptManager1" runat="server"></asp:ScriptManager>
+    <div class="homesearch">
+        <div id="div1" style="overflow: hidden" class="Search_Area">
+            <table style="width: 80%">
+                <tr>
+                    <td class="right" style="height: 35px">PIR No</td>
+                    <td>
+                        <asp:TextBox runat="server" ID="TextBox1" ClientIDMode="Static"></asp:TextBox>
+                    </td>
+                    <td class="right">Process </td>
+                    <td>
+                        <asp:DropDownList runat="server" ID="DropDownList1" ClientIDMode="Static">
+                            <asp:ListItem></asp:ListItem>
+                            <asp:ListItem>Maket</asp:ListItem>
+                            <asp:ListItem>QASL</asp:ListItem>
+                            <asp:ListItem>Production Line</asp:ListItem>
+                            <asp:ListItem>Evaluation</asp:ListItem>
+                        </asp:DropDownList>
+                    </td>
+                    <td class="right">Model</td>
+                    <td>
+                        <asp:TextBox runat="server" ID="TextBox2" ClientIDMode="Static" placeholder="Model1,Model2,..."></asp:TextBox></td>
+                    <td class="right">Issue By</td>
+                    <td>
+                        <asp:TextBox runat="server" ID="TextBox3" ClientIDMode="Static"></asp:TextBox></td>
+                    <td class="right">Up version
+                        <asp:CheckBox runat="server" ID="chk_Up" /></td>
+
+                </tr>
+            </table>
+            <table style="width: 100%">
+                <tr>
+                    <td style="text-align: left">
+                        <asp:Image runat="server" CssClass="Goto Demention" ImageUrl="~/Upload/images/forward.png" />
+                    </td>
+                    <td style="text-align: center">
+                        <asp:Button ID="btRegister" CssClass="bt" runat="server" Height="30px" Text="Create" OnClick="btRegister_Click" OnClientClick="return confirm('Are you sure to Register for PIR?');" />
+                        <asp:Button ID="btDelete" CssClass="bt2" runat="server" Text="Delete" Height="30px" OnClick="btDelete_Click" OnClientClick="return confirm('Are you sure to Delete for PIR?);" />
+                        <%--<asp:Button ID="btUpversion" CssClass="bt" runat="server" Text="Upversion" OnClick="btUpversion_Click" Height="30px" />--%>
+                      
+
+                    </td>
+                </tr>
+            </table>
+
+        </div>
+        <div id="div2" style="display: none" class="Search_Area">
+            <table style="width: 80%">
+                <tr>
+                    <td class="right" style="height: 35px">PIR No</td>
+                    <td>
+                        <asp:TextBox runat="server" ID="txtTVP" ClientIDMode="Static"></asp:TextBox>
+                        <asp:HiddenField runat="server" ID="HideIssueCode" ClientIDMode="Static" />
+                    </td>
+                    <td class="right">Status </td>
+                    <td>
+                        <asp:DropDownList runat="server" ID="DropStatus" ClientIDMode="Static">
+                            <asp:ListItem></asp:ListItem>
+                            <asp:ListItem>Waiting issue</asp:ListItem>
+                            <asp:ListItem>Waiting check</asp:ListItem>
+                            <asp:ListItem>Waiting approve</asp:ListItem>
+                            <asp:ListItem>PDC1 confirm route</asp:ListItem>
+                            <asp:ListItem>Return PE issue</asp:ListItem>
+                            <asp:ListItem>PQA implement confirm</asp:ListItem>
+                            <asp:ListItem>PQA implement check</asp:ListItem>
+                            <asp:ListItem>PQA implement approve</asp:ListItem>
+                            <asp:ListItem>Wait Part/Unit</asp:ListItem>
+                        </asp:DropDownList>
+                    </td>
+                    <td class="right">Model</td>
+                    <td>
+                        <asp:TextBox runat="server" ID="txtModel" ClientIDMode="Static" placeholder="Model1,Model2,..."></asp:TextBox></td>
+                    <td class="right">Issue By</td>
+                    <td>
+                        <asp:TextBox runat="server" ID="txtIssueBy" ClientIDMode="Static"></asp:TextBox></td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <asp:Image ID="BackTo" runat="server" CssClass=" Backto Demention" ImageUrl="~/Upload/images/back.png"></asp:Image>
+                    </td>
+                    <td colspan="6" style="text-align: center">
+                        <asp:Button ID="btnSearch" CssClass="bt" runat="server" Text="Search" OnClick="btnSearch_Click" />
+                        <asp:Button ID="btExport" CssClass="bt2" runat="server" Text="Export" Height="30px" />
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div style="padding-left: 2%; padding-bottom: 0.5%; padding-top: 1%; color: red">
+        <asp:Label runat="server" ID="lbl_count" ClientIDMode="Static"></asp:Label>
+    </div>
+    <div class="GridViewContainer ER_List" style="height: 445px;">
+        <asp:GridView ID="grv_PIR" CssClass="tb" runat="server" Width="250.5%" ClientIDMode="Static" AutoGenerateColumns="false" PageSize="11" AllowPaging="True" OnPageIndexChanging="grv_PIR_PageIndexChanging" OnRowDataBound="grv_PIR_RowDataBound">
+            <HeaderStyle BackColor="#ccf3e0" />
+            <RowStyle CssClass="cen" />
+            <Columns>
+                <asp:TemplateField HeaderText="Select" ItemStyle-Width="50px" HeaderStyle-Width="50px" HeaderStyle-BackColor="#70cce1" ItemStyle-CssClass="FrozenCell cen" HeaderStyle-CssClass="FrozenCell">
+                    <ItemTemplate>
+                        <asp:CheckBox ID="chk" runat="server" />
+                    </ItemTemplate>
+                </asp:TemplateField>
+            </Columns>
+            <Columns>
+
+                <asp:TemplateField HeaderText="PIRNo" ItemStyle-Width="90px" HeaderStyle-Width="90px" ItemStyle-CssClass="FrozenCell scroll00" HeaderStyle-CssClass="FrozenCell Infor scroll00">
+                    <ItemTemplate>
+                        <div class="TVPNoAction">
+                            <asp:LinkButton ID="lkPIRNo" runat="server" CommandArgument='<%# Eval("PIRNo") %>' CommandName='<%# Eval("Status") %>' Text='<%# Eval("PIRNo") %>' OnCommand="Action_Command"></asp:LinkButton>
+                        </div>
+                    </ItemTemplate>
+                </asp:TemplateField>
+                <asp:BoundField DataField="Status" ItemStyle-Width="160px" HeaderStyle-Width="160px" HeaderText="Status" SortExpression="Status" ItemStyle-CssClass="FrozenCell scroll1" HeaderStyle-CssClass="FrozenCell scroll1 Infor " />
+                <asp:BoundField DataField="Model" HeaderText="Model" SortExpression="Model" HeaderStyle-Width="120px" ItemStyle-Width="120px" ItemStyle-CssClass="FrozenCell scroll22 breakword20" HeaderStyle-CssClass="FrozenCell scroll22 Infor" />
+            </Columns>
+
+
+            <Columns>
+                <asp:BoundField DataField="Type" HeaderText="Type" ItemStyle-Width="90px" HeaderStyle-Width="90px" SortExpression="Type" />
+                <asp:BoundField DataField="Phase" HeaderText="Phase" ItemStyle-Width="100px" HeaderStyle-Width="100px" SortExpression="Phase" ItemStyle-CssClass="breakword30" />
+                <asp:BoundField DataField="Phenomenon" HeaderText="Phenomenon" ItemStyle-Width="100px" HeaderStyle-Width="100px" SortExpression="Phenomenon" />
+                <asp:BoundField DataField="ResponsibleDept" HeaderText="ResponsibleDept" ItemStyle-Width="120px" HeaderStyle-Width="120px" SortExpression="ResponsibleDept" />
+                <asp:TemplateField HeaderText="Attach" ItemStyle-Width="120px">
+                    <ItemTemplate>
+                        <asp:HyperLink runat="server" ID="Attach" rel='<%# Eval("Attach") %>' Text='<%# Eval("Attach") %>' NavigateUrl='<%# "file://cvn-veng/DCResource/PIR/"+"20" +Eval("PIRNo").ToString().Substring(4,2) +"/" + Eval("PIRNo").ToString().Trim() +"/"  + Server.HtmlEncode(Eval("Attach").ToString().Trim()) %>' Target="_blank"></asp:HyperLink>
+
+                    </ItemTemplate>
+                </asp:TemplateField>
+                <asp:BoundField DataField="IssueDept" HeaderText="Issue dept" ItemStyle-Width="70px" HeaderStyle-Width="70px" SortExpression="IssueDept" />
+                <asp:BoundField DataField="IssueBy" HeaderText="Issue by" ItemStyle-Width="130px" HeaderStyle-Width="130px" SortExpression="IssueBy" />
+                <asp:BoundField DataField="IssueDate" HeaderText="IssueDate" ItemStyle-Width="80px" HeaderStyle-Width="80px" SortExpression="IssueDate" DataFormatString="{0:yyyy-MM-dd}" />
+                <asp:BoundField DataField="ApproveBy" HeaderText="Approve by" ItemStyle-Width="130px" HeaderStyle-Width="130px" SortExpression="ApproveBy" />
+                <asp:BoundField DataField="ApproveDate" HeaderText="Approve date" ItemStyle-Width="80px" HeaderStyle-Width="80px" SortExpression="ApproveDate" DataFormatString="{0:yyyy-MM-dd}" />
+                <asp:BoundField DataField="Dept1Name" HeaderText="Dept1Name" ItemStyle-Width="70px" HeaderStyle-Width="70px" SortExpression="Dept1Name" />
+                <asp:BoundField DataField="Dept1Status" HeaderText="Dept1Status" ItemStyle-Width="70px" HeaderStyle-Width="70px" SortExpression="Dept1Status" />
+                <asp:BoundField DataField="Dept2Name" HeaderText="Dept2Name" ItemStyle-Width="70px" HeaderStyle-Width="70px" SortExpression="Dept2Name" />
+                <asp:BoundField DataField="Dept2Status" HeaderText="Dept2Status" ItemStyle-Width="70px" HeaderStyle-Width="70px" SortExpression="Dept2Status" />
+                <asp:BoundField DataField="Dept3Name" HeaderText="Dept3Name" ItemStyle-Width="70px" HeaderStyle-Width="70px" SortExpression="Dept3Name" />
+                <asp:BoundField DataField="Dept3Status" HeaderText="Dept3Status" ItemStyle-Width="70px" HeaderStyle-Width="70px" SortExpression="Dept3Status" />
+                <asp:BoundField DataField="Dept4Name" HeaderText="Dept4Name" ItemStyle-Width="70px" HeaderStyle-Width="70px" SortExpression="Dept4Name" />
+                <asp:BoundField DataField="Dept4Status" HeaderText="Dept4Status" ItemStyle-Width="70px" HeaderStyle-Width="70px" SortExpression="Dept4Status" />
+                <asp:BoundField DataField="Dept5Name" HeaderText="Dept5Name" ItemStyle-Width="70px" HeaderStyle-Width="70px" SortExpression="Dept5Name" />
+                <asp:BoundField DataField="Dept5Status" HeaderText="Dept5Status" ItemStyle-Width="70px" HeaderStyle-Width="70px" SortExpression="Dept5Status" />
+                <asp:BoundField DataField="Dept6Name" HeaderText="Dept6Name" ItemStyle-Width="70px" HeaderStyle-Width="70px" SortExpression="Dept6Name" />
+                <asp:BoundField DataField="Dept6Status" HeaderText="Dept6Status" ItemStyle-Width="70px" HeaderStyle-Width="70px" SortExpression="Dept6Status" />
+
+                <asp:BoundField DataField="ConfirmCoutermeasureBy" HeaderText="ConfirmCoutermeasureBy" ItemStyle-Width="130px" HeaderStyle-Width="130px" SortExpression="ConfirmCoutermeasureBy" />
+                <asp:BoundField DataField="ConfirmCoutermeasureDate" HeaderText="ConfirmCoutermeasureDate" ItemStyle-Width="80px" HeaderStyle-Width="80px" SortExpression="ConfirmCoutermeasureDate" DataFormatString="{0:yyyy-MM-dd}" />
+                <asp:BoundField DataField="ApproveCoutermeasureBy" HeaderText="ApproveCoutermeasureBy" ItemStyle-Width="130px" HeaderStyle-Width="130px" SortExpression="ApproveCoutermeasureBy" />
+                <asp:BoundField DataField="ApproveCoutermeasureDate" HeaderText="ApproveCoutermeasureDate" ItemStyle-Width="80px" HeaderStyle-Width="80px" SortExpression="ApproveCoutermeasureDate" DataFormatString="{0:yyyy-MM-dd}" />
+                <asp:BoundField DataField="ApplyPlan" HeaderText="ApplyPlan" ItemStyle-Width="70px" HeaderStyle-Width="70px" SortExpression="ApplyPlan" />
+                <asp:BoundField DataField="ApplyStatus" HeaderText="ApplyStatus" ItemStyle-Width="70px" HeaderStyle-Width="70px" SortExpression="ApplyStatus" />
+                <asp:BoundField DataField="Result" HeaderText="Result" ItemStyle-Width="70px" HeaderStyle-Width="70px" SortExpression="Result" />
+            </Columns>
+            <PagerStyle CssClass="Pager FrozenCell" HorizontalAlign="Left" VerticalAlign="Bottom" ForeColor="#333333" Font-Size="14px" BorderStyle="None" />
+        </asp:GridView>
+    </div>
+    <div id="PIRPopup" style="width: 80%; left: 10%" class="DivCheck divENG homesearch">
+        <table style="width: 95%">
+            <tr>
+                <td colspan="8" class="Title" style="font-size: 25px; margin-bottom: 1%; text-align: center">
+                    <asp:Label runat="server" ID="lbTVP" ClientIDMode="Static" ForeColor="#581010">PIR-21-0001-01</asp:Label>
+                    <asp:HiddenField runat="server" ID="HideIssueBy" ClientIDMode="Static" />
+                    <asp:Button runat="server" ID="Button2" Text="Close" CssClass="Close" OnClientClick="ClosePopup(); return false;" />
+                </td>
+            </tr>
+            <tr>
+                <td class="right">Model<span>*</span>:</td>
+                <td>
+                        <asp:TextBox runat="server" ID="txtModelP" ReadOnly="true" CssClass="textbox Model" placeholder="Select model" ></asp:TextBox>
+                        <div id="ModelDiv" class="ModelDivv">
+                            <asp:TextBox runat="server" ID="txtSearch" CssClass="Special"  placeholder="Search..." onkeyup="Search();" ClientIDMode="Static"></asp:TextBox>
+                            <div class="ListModelList">
+                                <asp:GridView runat="server" ID="gvModel" CssClass="GridView" Width="100%" AutoGenerateColumns="False" ClientIDMode="Static" >
+                                    <AlternatingRowStyle BackColor="White" />
+                                    <Columns>
+                                        <asp:TemplateField ItemStyle-CssClass="right" HeaderText="Model list"> 
+                                            <ItemTemplate><asp:CheckBox runat="server" ID="chkModel" onclick="GetModel(this);" /></ItemTemplate>
+                                        </asp:TemplateField>
+                                        <asp:BoundField DataField="Model" SortExpression="Model" />
+                                    </Columns>
+                                </asp:GridView>
+                            </div>
+                        </div>
+                        <asp:HiddenField runat="server" ID="HideModel" ClientIDMode="Static" />
+                </td>
+                <td class="right">Line:</td>
+                <td>
+                    <asp:TextBox runat="server" ID="TextBox9" ClientIDMode="Static"></asp:TextBox>
+                </td>
+                <td class="right">Destination:</td>
+                <td>
+                    <asp:TextBox runat="server" ID="TextBox5" Width="50%" ClientIDMode="Static"></asp:TextBox>
+                </td>
+                <td class="right">Serial No/ Body No</td>
+                <td>
+                    <asp:TextBox runat="server" ID="TextBox4" ClientIDMode="Static"></asp:TextBox>
+                </td>
+
+
+            </tr>
+            <tr>
+                <td class="right">Type<span>*</span>:</td>
+                <td style="width: 20%">
+                    <asp:DropDownList runat="server" ID="DropDownList11" ClientIDMode="Static">
+                        <asp:ListItem></asp:ListItem>
+                        <asp:ListItem>QASL</asp:ListItem>
+                        <asp:ListItem>DOA</asp:ListItem>
+                        <asp:ListItem>Production</asp:ListItem>
+                        <asp:ListItem>Others</asp:ListItem>
+                    </asp:DropDownList>
+
+                <td class="right">Phase<span>*</span>:</td>
+                <td style="width: 20%">
+                    <asp:DropDownList runat="server" ID="DropDownList2" ClientIDMode="Static">
+                        <asp:ListItem></asp:ListItem>
+                        <asp:ListItem>MT</asp:ListItem>
+                        <asp:ListItem>MP</asp:ListItem>
+                    </asp:DropDownList>
+                </td>
+                <td class="right">Detected Date:</td>
+                <td>
+                    <asp:TextBox runat="server" ID="TextBox18" Width="50%" ClientIDMode="Static"></asp:TextBox></td>
+                <td class="right">NG QTY:</td>
+                <td>
+                    <asp:TextBox runat="server" ID="TextBox14" ClientIDMode="Static"></asp:TextBox>
+                </td>
+
+            </tr>
+            <tr>
+                <td>Phenomenon level: </td>
+                <td>
+                    <asp:DropDownList runat="server" ID="DropDownList3" ClientIDMode="Static">
+                        <asp:ListItem></asp:ListItem>
+                        <asp:ListItem>Critical</asp:ListItem>
+                        <asp:ListItem>Major</asp:ListItem>
+                        <asp:ListItem>Moderate</asp:ListItem>
+                        <asp:ListItem>Minor</asp:ListItem>
+                    </asp:DropDownList></td>
+                <td>Phenomenon main Category: </td>
+                <td>
+                    <asp:DropDownList runat="server" ID="DropDownList12" ClientIDMode="Static">
+                        <asp:ListItem></asp:ListItem>
+                        <asp:ListItem>Apperance</asp:ListItem>
+                        <asp:ListItem>Packing condition</asp:ListItem>
+                    </asp:DropDownList></td>
+                <td>Phenomenon sub Category: </td>
+                <td>
+                    <asp:DropDownList runat="server" ID="DropDownList4" ClientIDMode="Static">
+                        <asp:ListItem></asp:ListItem>
+                        <asp:ListItem>MT</asp:ListItem>
+                        <asp:ListItem>MP</asp:ListItem>
+                    </asp:DropDownList></td>
+                <td colspan="2"></td>
+            </tr>
+            <tr>
+                <td>Phenomenon: </td>
+                <td colspan="7">
+                    <asp:TextBox runat="server" ID="TextBox10" ClientIDMode="Static" Width="99%" TextMode="MultiLine" Height="30px"></asp:TextBox></td>
+            </tr>
+            <tr>
+
+                <td>Detect process Category: </td>
+                <td>
+                    <asp:DropDownList runat="server" ID="DropDownList7" ClientIDMode="Static">
+                        <asp:ListItem></asp:ListItem>
+                        <asp:ListItem>Maket</asp:ListItem>
+                        <asp:ListItem>QASL</asp:ListItem>
+                        <asp:ListItem>Produciton Line</asp:ListItem>
+                        <asp:ListItem>Evaluastion</asp:ListItem>
+                    </asp:DropDownList></td>
+                <td>Sub place Category: </td>
+                <td>
+                    <asp:DropDownList runat="server" ID="DropDownList9" ClientIDMode="Static">
+                        <asp:ListItem></asp:ListItem>
+                        <asp:ListItem>Claim from sale</asp:ListItem>
+                        <asp:ListItem>DOA investigation</asp:ListItem>
+                    </asp:DropDownList></td>
+                <td>Stop Shipment: </td>
+                <td>
+                    <asp:TextBox runat="server" ID="col1_PartName" ClientIDMode="Static" onchange="return CheckPartName(this);"></asp:TextBox></td>
+                <td>Stop Shipment No: </td>
+                <td>
+                    <asp:TextBox runat="server" ID="TextBox6" ClientIDMode="Static" onchange="return CheckPartName(this);"></asp:TextBox></td>
+            </tr>
+            <tr>
+                <td>Test item: </td>
+                <td>
+                    <asp:DropDownList runat="server" ID="DropDownList8" ClientIDMode="Static">
+                        <asp:ListItem></asp:ListItem>
+                        <asp:ListItem>Vibration Test</asp:ListItem>
+                        <asp:ListItem>Drop Test</asp:ListItem>
+                        <asp:ListItem>Drop Test</asp:ListItem>
+                        <asp:ListItem>Margin Drop Test</asp:ListItem>
+                        <asp:ListItem>Handling Drop Test</asp:ListItem>
+                        <asp:ListItem>Steel ball Drop Test</asp:ListItem>
+                        <asp:ListItem>Statis Pressure Test</asp:ListItem>
+                        <asp:ListItem>Keep Test</asp:ListItem>
+                        <asp:ListItem>Endurance</asp:ListItem>
+                        <asp:ListItem>Pallet Drop</asp:ListItem>
+                    </asp:DropDownList></td>
+                <td>Production History: </td>
+                <td>
+                    <asp:DropDownList runat="server" ID="DropDownList13" ClientIDMode="Static">
+                        <asp:ListItem></asp:ListItem>
+                        <asp:ListItem>Dithang - No out line</asp:ListItem>
+                        <asp:ListItem>Repair</asp:ListItem>
+                    </asp:DropDownList></td>
+                <td>Repair Content: </td>
+                <td>
+                    <asp:TextBox runat="server" ID="TextBox11" ClientIDMode="Static" Height="30px" ></asp:TextBox></td>
+                <td>Reply due date: </td>
+                <td>
+                    <asp:TextBox runat="server" ID="TextBox12" ClientIDMode="Static"></asp:TextBox></td>
+
+            </tr>
+           <%-- <tr>
+                <td>Attach Other</td>
+                <td colspan="4">
+                    <asp:FileUpload runat="server" ID="FileAll" ClientIDMode="Static" Width="400px" Height="22px" /></td>
+            </tr>--%>
+        </table>
+
+<%--        <table class="pirissue">
+            <tr>
+                <td>Phenomenon level: </td>
+                <td>
+                    <asp:DropDownList runat="server" ID="DropDownList3" ClientIDMode="Static">
+                        <asp:ListItem></asp:ListItem>
+                        <asp:ListItem>Critical</asp:ListItem>
+                        <asp:ListItem>Major</asp:ListItem>
+                        <asp:ListItem>Moderate</asp:ListItem>
+                        <asp:ListItem>Minor</asp:ListItem>
+                    </asp:DropDownList></td>
+                <td>Phenomenon main Category: </td>
+                <td>
+                    <asp:DropDownList runat="server" ID="DropDownList12" ClientIDMode="Static">
+                        <asp:ListItem></asp:ListItem>
+                        <asp:ListItem>Apperance</asp:ListItem>
+                        <asp:ListItem>Packing condition</asp:ListItem>
+                    </asp:DropDownList></td>
+                <td>Phenomenon sub Category: </td>
+                <td>
+                    <asp:DropDownList runat="server" ID="DropDownList4" ClientIDMode="Static">
+                        <asp:ListItem></asp:ListItem>
+                        <asp:ListItem>MT</asp:ListItem>
+                        <asp:ListItem>MP</asp:ListItem>
+                    </asp:DropDownList></td>
+            </tr>
+            <tr>
+                <td>Phenomenon: </td>
+                <td colspan="7">
+                    <asp:TextBox runat="server" ID="TextBox10" ClientIDMode="Static"></asp:TextBox></td>
+            </tr>
+            <tr>
+
+                <td>Detect process Category: </td>
+                <td>
+                    <asp:DropDownList runat="server" ID="DropDownList7" ClientIDMode="Static">
+                        <asp:ListItem></asp:ListItem>
+                        <asp:ListItem>Maket</asp:ListItem>
+                        <asp:ListItem>QASL</asp:ListItem>
+                        <asp:ListItem>Produciton Line</asp:ListItem>
+                        <asp:ListItem>Evaluastion</asp:ListItem>
+                    </asp:DropDownList></td>
+                <td>Sub place Category: </td>
+                <td>
+                    <asp:DropDownList runat="server" ID="DropDownList9" ClientIDMode="Static">
+                        <asp:ListItem></asp:ListItem>
+                        <asp:ListItem>Claim from sale</asp:ListItem>
+                        <asp:ListItem>DOA investigation</asp:ListItem>
+                    </asp:DropDownList></td>
+                <td>Stop Shipment: </td>
+                <td>
+                    <asp:TextBox runat="server" ID="col1_PartName" ClientIDMode="Static" onchange="return CheckPartName(this);"></asp:TextBox></td>
+                <td>Stop Shipment No: </td>
+                <td>
+                    <asp:TextBox runat="server" ID="TextBox6" ClientIDMode="Static" onchange="return CheckPartName(this);"></asp:TextBox></td>
+            </tr>
+            <tr>
+                <td>Test item: </td>
+                <td>
+                    <asp:DropDownList runat="server" ID="DropDownList8" ClientIDMode="Static">
+                        <asp:ListItem></asp:ListItem>
+                        <asp:ListItem>Vibration Test</asp:ListItem>
+                        <asp:ListItem>Drop Test</asp:ListItem>
+                        <asp:ListItem>Drop Test</asp:ListItem>
+                        <asp:ListItem>Margin Drop Test</asp:ListItem>
+                        <asp:ListItem>Handling Drop Test</asp:ListItem>
+                        <asp:ListItem>Steel ball Drop Test</asp:ListItem>
+                        <asp:ListItem>Statis Pressure Test</asp:ListItem>
+                        <asp:ListItem>Keep Test</asp:ListItem>
+                        <asp:ListItem>Endurance</asp:ListItem>
+                        <asp:ListItem>Pallet Drop</asp:ListItem>
+                    </asp:DropDownList></td>
+                <td>Production History: </td>
+                <td>
+                    <asp:DropDownList runat="server" ID="DropDownList13" ClientIDMode="Static">
+                        <asp:ListItem></asp:ListItem>
+                        <asp:ListItem>Dithang - No out line</asp:ListItem>
+                        <asp:ListItem>Repair</asp:ListItem>
+                    </asp:DropDownList></td>
+                <td>Repair Content: </td>
+                <td>
+                    <asp:TextBox runat="server" ID="TextBox11" ClientIDMode="Static"></asp:TextBox></td>
+                <td>Reply due date: </td>
+                <td>
+                    <asp:TextBox runat="server" ID="TextBox12" ClientIDMode="Static"></asp:TextBox></td>
+
+            </tr>
+            <tr>
+                <td>Attach Other</td>
+                <td colspan="4">
+                    <asp:FileUpload runat="server" ID="FileAll" ClientIDMode="Static" Width="400px" Height="22px" /></td>
+            </tr>
+        </table>--%>
+        <table>
+            <tr>
+                <td>Responsible Dept<span>*</span>:</td>
+                <td style="width: 100px"></td>
+                <td>Distribute to<span>*</span>:</td>
+            </tr>
+            <tr>
+                <td>
+                    <table style="border: none; font-size: 12px;" runat="server" width="100%" id="Table1">
+                        <tr>
+                            <td style="padding: 0px">
+                                <asp:CheckBox runat="server" ID="CheckBox1" Text=" TL PE1" CssClass=" black" /></td>
+                            <td style="padding: 0px">
+                                <asp:CheckBox runat="server" ID="CheckBox2" Text=" TL PKE" CssClass="chk black" /></td>
+                            <td style="padding: 0px">
+                                <asp:CheckBox runat="server" ID="CheckBox3" Text=" TL PDC1" CssClass="chk black" /></td>
+                            <td style="padding: 0px">
+                                <asp:CheckBox runat="server" ID="CheckBox5" CssClass="chk  black" Text=" TL ASSY" /></td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 0px">
+                                <asp:CheckBox runat="server" ID="CheckBox8" Text=" TL PE2" CssClass="black" /></td>
+                            <td style="padding: 0px">
+                                <asp:CheckBox runat="server" ID="CheckBox9" Text=" TL MQA" CssClass="chk black" /></td>
+                            <td style="padding: 0px">
+                                <asp:CheckBox runat="server" ID="CheckBox10" Text=" TL PDC2" CssClass="chk black" /></td>
+                            <td style="padding: 0px">
+                                <asp:CheckBox runat="server" ID="CheckBox11" Text=" TL PCB" CssClass="chk black" /></td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 0px">
+                                <asp:CheckBox runat="server" ID="CheckBox15" Text=" TS PE1" CssClass="black" /></td>
+                            <td style="padding: 0px">
+                                <asp:CheckBox runat="server" ID="CheckBox16" Text=" TS MQA" CssClass="chk black" /></td>
+                            <td style="padding: 0px">
+                                <asp:CheckBox runat="server" ID="CheckBox17" Text=" TS PDC1" CssClass="chk black" /></td>
+                            <td style="padding: 0px">
+                                <asp:CheckBox runat="server" ID="CheckBox18" Text=" TS ASSY" CssClass="chk black" /></td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 0px">
+                                <asp:CheckBox runat="server" ID="CheckBox22" Text=" TS PE2" CssClass="black" /></td>
+                            <td style="padding: 0px">
+                                <asp:CheckBox runat="server" ID="CheckBox23" Text=" TS PQA" CssClass="chk black" /></td>
+                            <td style="padding: 0px">
+                                <asp:CheckBox runat="server" ID="CheckBox24" Text=" TS PDC2" CssClass="chk black" /></td>
+                            <td style="padding: 0px">
+                                <asp:CheckBox runat="server" ID="CheckBox25" Text=" TS PCB" CssClass="chk black" /></td>
+                        </tr>
+                    </table>
+
+                </td>
+                <td></td>
+                <td>
+                    <table style="border: none; font-size: 12px;" runat="server" width="100%" id="Table2">
+                        <tr>
+                            <td style="padding: 0px">
+                                <asp:CheckBox runat="server" ID="CheckBox28" Text=" TL PE1" CssClass=" black" /></td>
+                            <td style="padding: 0px">
+                                <asp:CheckBox runat="server" ID="CheckBox29" Text=" TL PKE" CssClass="chk black" /></td>
+                            <td style="padding: 0px">
+                                <asp:CheckBox runat="server" ID="CheckBox30" Text=" TL PDC1" CssClass="chk black" /></td>
+                            <td style="padding: 0px">
+                                <asp:CheckBox runat="server" ID="CheckBox31" Text=" TL MQA" CssClass="chk black" /></td>
+                            <td style="padding: 0px">
+                                <asp:CheckBox runat="server" ID="CheckBox32" CssClass="chk  black" Text=" TL ASSY" /></td>
+                            <td style="padding: 0px">
+                                <asp:CheckBox runat="server" ID="CheckBox33" Text=" TL MO" CssClass=" chk black" /></td>
+                            <td style="padding: 0px">
+                                <asp:CheckBox runat="server" ID="CheckBox34" Text=" TL CIS" CssClass=" chk black" /></td>
+
+                        </tr>
+                        <tr>
+                            <td style="padding: 0px">
+                                <asp:CheckBox runat="server" ID="CheckBox35" Text=" TL PUR" CssClass="black" /></td>
+                            <td style="padding: 0px">
+                                <asp:CheckBox runat="server" ID="CheckBox36" Text=" TS PE1" CssClass="chk black" /></td>
+                            <td style="padding: 0px">
+                                <asp:CheckBox runat="server" ID="CheckBox37" Text=" TS MQA" CssClass="chk black" /></td>
+                            <td style="padding: 0px">
+                                <asp:CheckBox runat="server" ID="CheckBox38" Text=" TS PDC1" CssClass="chk black" /></td>
+                            <td style="padding: 0px">
+                                <asp:CheckBox runat="server" ID="CheckBox39" Text=" TS ASSY" CssClass="chk black" /></td>
+                            <td style="padding: 0px">
+                                <asp:CheckBox runat="server" ID="CheckBox40" Text=" TS MO" CssClass="chk black" /></td>
+                            <td style="padding: 0px">
+                                <asp:CheckBox runat="server" ID="CheckBox41" Text=" TS LOG" CssClass="chk black" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 0px">
+                                <asp:CheckBox runat="server" ID="CheckBox42" Text=" TL PE2" CssClass="black" /></td>
+                            <td style="padding: 0px">
+                                <asp:CheckBox runat="server" ID="CheckBox43" Text=" TL PQA" CssClass="chk black" /></td>
+                            <td style="padding: 0px">
+                                <asp:CheckBox runat="server" ID="CheckBox44" Text=" TL PDC2" CssClass="chk black" /></td>
+                            <td style="padding: 0px">
+                                <asp:CheckBox runat="server" ID="CheckBox45" Text=" TL LOG" CssClass="chk black" /></td>
+                            <td style="padding: 0px">
+                                <asp:CheckBox runat="server" ID="CheckBox46" CssClass="chk black" Text=" TL PCB" />
+                            </td>
+                            <td style="padding: 0px">
+                                <asp:CheckBox runat="server" ID="CheckBox47" CssClass="chk black" Text=" TL MSD" /></td>
+                            <td style="padding: 0px">
+                                <asp:CheckBox runat="server" ID="CheckBox48" Text=" TL MFE1" CssClass="chk black" /></td>
+                        </tr>
+                        <tr>
+
+                            <td style="padding: 0px">
+                                <asp:CheckBox runat="server" ID="CheckBox49" Text=" TS PE2" CssClass="black" /></td>
+                            <td style="padding: 0px">
+                                <asp:CheckBox runat="server" ID="CheckBox50" Text=" TS PQA" CssClass="chk black" /></td>
+                            <td style="padding: 0px">
+                                <asp:CheckBox runat="server" ID="CheckBox51" Text=" TS PDC2" CssClass="chk black" /></td>
+                            <td style="padding: 0px">
+                                <asp:CheckBox runat="server" ID="CheckBox52" Text=" TS PCB" CssClass="chk black" /></td>
+                            <td style="padding: 0px">
+                                <asp:CheckBox runat="server" ID="CheckBox53" Text=" TS MSD" CssClass="chk black" /></td>
+                            <td style="padding: 0px">
+                                <asp:CheckBox runat="server" ID="CheckBox54" Text=" TS MFE3" CssClass="chk black" /></td>
+                        </tr>
+                    </table>
+
+                </td>
+            </tr>
+        </table>
+        <table>
+            <tr>
+                <td>Attach Other</td>
+                <td colspan="4" style="width:100%">
+                    <asp:FileUpload runat="server" ID="FileAll" ClientIDMode="Static" Width="400px" Height="22px" /></td>
+            </tr>
+            <tr>
+                <td style="padding-left: 40%" colspan="2">
+                    <asp:Button runat="server" ID="btNext" ClientIDMode="Static" Text="Issue" CssClass="bt float" OnClick="btNext_Click" OnClientClick="return NextCondition(); " />
+                <td style="padding-left: 50%">
+                    <asp:Button runat="server" ID="btReturn" ClientIDMode="Static" Text="Return" CssClass="bt2 float" OnClientClick="return Return_Condition();" OnClick="btReturn_Click" />
+                </td>
+                <td style="padding-left: 21%" >
+                    <asp:Label runat="server" Text="Reason Return"></asp:Label>
+                </td>
+                 <td >
+                    <asp:TextBox ID="txtComment" ClientIDMode="Static" runat="server" TextMode="MultiLine" placeholder=" Some comment..." CssClass="" Height="50px" Width="84%"></asp:TextBox>
+                </td>
+            </tr>
+        </table>
+
+    </div>
+    <div id="Countermeasure" class="DivCheck divENG homesearch" style="width: 840px">
+        <table style="width: 100%">
+            <tr>
+                <td colspan="3" class="Title" style="font-size: 20px; margin-bottom: 1%; text-align: right">
+                    <asp:Label runat="server" ID="lb_PQA_TVPNo" ClientIDMode="Static" ForeColor="#581010">PIR-22-0002-01 </asp:Label></td>
+                <td>
+                    <asp:Button runat="server" ID="Button3" Text="Close" CssClass="Close" OnClientClick="CloseCountermeasure(); return false;" /></td>
+            </tr>
+            <tr>
+                <asp:HyperLink runat="server">Click here to see detail Request</asp:HyperLink>
+            </tr>
+            <tr>
+                <td class="right" style="padding-top: 10px">Coutermeasure</td>
+                <td style="padding-top: 10px">
+                    <asp:TextBox ID="txt_PQA_qty1" runat="server" Width="70px"></asp:TextBox></td>
+                <td class="right" style="padding-top: 10px">QASL</td>
+                <td style="padding-top: 10px">
+                    <asp:TextBox ID="txt_PQA_QASL" runat="server" Width="300px"></asp:TextBox></td>
+            </tr>
+            <tr>
+                <td class="right" style="padding-top: 10px">Qty_Extra check</td>
+                <td>
+                    <asp:TextBox ID="txt_PQA_qty2" runat="server" Width="70px"></asp:TextBox></td>
+                <td class="right" style="padding-top: 10px">Extra check item</td>
+                <td style="padding-top: 10px">
+                    <asp:TextBox ID="txt_PQA_excheck" runat="server" Width="300px"></asp:TextBox></td>
+            </tr>
+
+            <tr>
+                <td colspan="4">
+                    <div>
+                        <table style="width: 100%">
+                            <tr>
+                                <td style="padding-right: 45px">
+                                    <asp:Button runat="server" ID="bt_PQAaction" ClientIDMode="Static" CssClass="bt_PQAaction" /></td>
+                                <td>Reason return</td>
+                                <td>
+                                    <asp:TextBox ID="txt_PQAReason" TextMode="MultiLine" placeholder=" Some comment..." CssClass="txtReturn" runat="server"></asp:TextBox></td>
+                                <td>
+                                    <asp:Button runat="server" ID="bt_PQAReturn" CssClass="bt_PQAReturn" Text="Return" /></td>
+                            </tr>
+                        </table>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div id="Apply_Popup" class="DivCheck divENG homesearch" style="width: 650px">
+        <table style="width: 100%">
+            <tr>
+                <td colspan="3" class="Title" style="font-size: 20px; margin-bottom: 1%; text-align: right">
+                    <asp:Label runat="server" ID="lb_PDC1_TVPNo" ClientIDMode="Static" ForeColor="#581010">PIR-22-0003-01</asp:Label></td>
+                <td>
+                    <asp:Button runat="server" ID="Button1" Text="Close" CssClass="Close" OnClientClick="CloseApply_Popup(); return false;" /></td>
+            </tr>
+            <tr>
+                <td colspan="4">
+                    <asp:HyperLink ID="HyperLink3" runat="server" Text="Click here to see detail Request" Font-Size="18px" Target="_blank"></asp:HyperLink><span>*</span></td>
+
+            </tr>
+            <tr>
+                <td class="right" style="padding-top: 10px">Apply Date:</td>
+                <td style="padding-top: 10px">
+                    <asp:TextBox runat="server" ClientIDMode="Static" ID="TextBox7" TextMode="MultiLine" CssClass="" Height="35px" Width="80%"></asp:TextBox></td>
+                <td class="right" style="padding-top: 10px">Release Shipment:</td>
+                <td style="padding-top: 10px">
+                    <asp:RadioButton ID="rd_runningTVP_yes" GroupName="group1" Text=" Yes" Style="color: green; font-weight: bold;" runat="server" />
+                    <asp:RadioButton ID="rd_runningTVP_no" GroupName="group1" Text=" No" Style="color: red; font-weight: bold;" runat="server" /></td>
+            </tr>
+            <tr>
+                <td class="right" style="padding-top: 10px">Apply countermeasure status:</td>
+                <td>
+                    <asp:RadioButton ID="RadioButton1" GroupName="group2" Text=" Done" Style="color: green; font-weight: bold;" runat="server" />
+                    <asp:RadioButton ID="RadioButton2" GroupName="group2" Text=" Not yet" Style="color: red; font-weight: bold;" runat="server" />
+                </td>
+                <td class="right" style="padding-top: 10px">Reword result</td>
+                <td style="padding-top: 10px">
+                    <asp:TextBox runat="server" ClientIDMode="Static" ID="txtPDC1Line" TextMode="MultiLine" CssClass="" Height="35px" Width="80%"></asp:TextBox>
+                </td>
+            </tr>
+            <tr>
+                <td class="right" style="padding-top: 10px">Result:</td>
+                <td style="padding-top: 10px">
+                    <asp:RadioButton ID="RadioButton3" GroupName="group3" Text=" OK" Style="color: green; font-weight: bold;" runat="server" />
+                    <asp:RadioButton ID="RadioButton4" GroupName="group3" Text=" NG" Style="color: red; font-weight: bold;" runat="server" />
+                </td>
+                <td class="right" style="padding-top: 10px">Recheck result</td>
+                <td style="padding-top: 10px">
+                    <asp:TextBox runat="server" ClientIDMode="Static" ID="txtPDC1_Destination" TextMode="MultiLine" CssClass="" Height="35px" Width="80%"></asp:TextBox>
+                </td>
+            </tr>
+
+            <tr>
+                <td class="right">Comment:</td>
+                <td colspan="3">
+                    <asp:TextBox runat="server" ClientIDMode="Static" ID="TextBox8" TextMode="MultiLine" CssClass="" Height="35px" Width="80%"></asp:TextBox>
+                </td>
+
+            </tr>
+            <tr runat="server" id="PDC1_Return1">
+                <td class="right">PIC return:</td>
+                <td>
+                    <asp:Label runat="server" ID="lblPDC1_ReturnBy" ClientIDMode="Static"></asp:Label>
+                </td>
+                <td class="right">Date return: </td>
+                <td>
+                    <asp:Label runat="server" ID="lblPDC1_ReturnDate" ClientIDMode="Static"></asp:Label>
+                </td>
+            </tr>
+            <tr runat="server" id="PDC1_Return2">
+                <td class="right">Reason return:</td>
+                <td colspan="3">
+                    <asp:Label runat="server" ID="lblPDC1_ReasonReturn" ClientIDMode="Static"></asp:Label>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="4">
+                    <div>
+                        <table>
+                            <tr>
+                                <td>
+                                    <asp:Button runat="server" ID="bt_PDC1Issue" ClientIDMode="Static" Text="Confirm" CssClass="bt_PDC1issue" /></td>
+                                <td style="padding-left: 45px">
+                                    <asp:Label runat="server" ID="lblPDC1cmt" ClientIDMode="Static" CssClass="black"></asp:Label></td>
+                                <td>
+                                    <asp:TextBox ID="txtPDC1_reason" ClientIDMode="Static" runat="server" TextMode="MultiLine" placeholder=" Some comment..." CssClass="" Height="50px" Width="100%"></asp:TextBox>
+                                </td>
+                                <td>
+
+                                    <asp:Button runat="server" ID="bt_PDC1Return" Text="Return" ClientIDMode="Static" CssClass="bt_PDC1postpone" /></td>
+                            </tr>
+                        </table>
+
+
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+
+</asp:Panel>
+<script type="text/javascript">
+    var ajax_file = 'http://cvn-veng:83/View/Ajax.aspx';
+    function ShowPopup() {
+        $('#PIRPopup').show();
+        $('#background').show();
+        $('#background').css('opacity', '0.5');
+    }
+    function ClosePopup() {
+        $('#txtComment').val('');
+        $('#PIRPopup').hide();
+        $('#background').hide();
+    };
+    function ShowCountermeasure() {
+        $('#Countermeasure').show();
+        $('#background').show();
+        $('#background').css('opacity', '0.5');
+    }
+    function CloseCountermeasure() {
+        $('#Countermeasure').hide();
+        $('#background').hide();
+    };
+    function ShowApply_Popup() {
+        $('#Apply_Popup').show();
+        $('#background').show();
+        $('#background').css('opacity', '0.5');
+    }
+    function CloseApply_Popup() {
+        $('#Apply_Popup').hide();
+        $('#background').hide();
+    };
+
+
+    function ReadAttachfile(cb) {
+        var TVPNo = $('#lbTVP').text();
+        var Yearr = '20' + TVPNo.substring(4, 6);
+        var filename = cb.title;
+        if (filename == '') {
+            filename = cb.text;
+        }
+        hypAttachOther.NavigateUrl = "file://cvn-veng/DCResource/ERI/" + Yearr + "/" + TVPNo + "/AttachOther/" + filename;
+        window.location.href = hypAttachOther.NavigateUrl;
+    }
+    //-----------------Select Model------------------
+    function GetModel(cb) {
+        var grid = document.getElementById('gvModel');
+        var ModelList = $('#ctl07_txtModelP').val();
+        if (ModelList.length != 0) {
+            ModelList = $('#ctl07_txtModelP').val() + ',';
+        }
+        var checkBoxes = grid.getElementsByTagName("input");
+        var checkk = cb.checked;
+        for (var i = 0; i < checkBoxes.length; i++) {
+            var row = checkBoxes[i].parentNode.parentNode;
+            var Model = row.cells[1].innerHTML.trim();
+            if (checkBoxes[i].checked == checkk) {
+                if (checkBoxes[i].checked == true) {
+                    if (ModelList.search(Model) < 0) {
+                        ModelList = ModelList + Model + ',';
+                    }
+                }
+                else {
+                    ModelList = ModelList.replace(Model + ',', '');
+                }
+            }
+            else {
+                if (checkBoxes[i].checked == false) {
+                    ModelList = ModelList.replace(Model + ',', '');
+                }
+            }
+        }
+        $('#ctl07_txtModelP').val(ModelList.substring(0, ModelList.length - 1));
+        $('#HideModel').val(ModelList.substring(0, ModelList.length - 1));
+    };
+    function BindCheck() {
+        var ModelList = $('#ctl07_txtModelP').val();
+        var grid = document.getElementById('gvModel');
+        var checkBoxes = grid.getElementsByTagName("input");
+        for (var i = 0; i < checkBoxes.length; i++) {
+            var row = checkBoxes[i].parentNode.parentNode;
+            var Model = row.cells[1].innerHTML.trim();
+            if (ModelList.search(Model) >= 0) {
+                checkBoxes[i].checked = true;
+            }
+            else {
+                checkBoxes[i].checked = false;
+            }
+        }
+    }
+    function Search() {
+        var SearchText = document.getElementById('txtSearch').value;
+        if (SearchText != '') {
+            var href = ajax_file + '/CheckModelTVP';
+            $.ajax({
+                type: 'POST',
+                url: href,
+                data: "{'SearchText':'" + SearchText + "'}",
+                contentType: 'application/json; charset=utf-8',
+                dataType: 'json',
+                success: function (response) {
+                    if (response.d[0] == '1') {
+                        var href2 = ajax_file + '/ListModelTVP';
+                        $.ajax({
+                            type: 'POST',
+                            url: href2,
+                            data: "{'SearchText':'" + SearchText + "'}",
+                            contentType: 'application/json; charset=utf-8',
+                            dataType: 'json',
+                            success: function (response) {
+                                ModelistDesign(response);
+                                BindCheck();
+                            },
+                            error: function (response) {
+                                alert('Can not search!');
+                            }
+                        });
+                    }
+                    else {
+                        var row = $("[id*=gvModel] tr:last-child").clone(true);
+                        $("[id*=gvModel] tr").not($("[id*=gvModel] tr:first-child")).remove();
+                        $("td", row).eq(0).html('No result');
+                        $("td", row).eq(1).html($(this).find("Model").text());
+                        $("[id*=gvModel]").append(row);
+                        row = $("[id*=gvModel] tr:last-child").clone(true);
+                    }
+                },
+                error: function (response) {
+                    alert('Can not search!');
+                }
+            });
+        }
+        else {
+            var href2 = ajax_file + '/ListModelTVP';
+            $.ajax({
+                type: 'POST',
+                url: href2,
+                data: "{'SearchText':'" + SearchText + "'}",
+                contentType: 'application/json; charset=utf-8',
+                dataType: 'json',
+                success: function (response) {
+                    ModelistDesign(response);
+                    BindCheck();
+                },
+                error: function (response) {
+                    alert('Can not search!');
+                }
+            });
+        }
+    }
+    function ModelistDesign(response) {
+        var xmlDoc = $.parseXML(response.d);
+        var xml = $(xmlDoc);
+        var Model = xml.find("Table");
+        var row = $("[id*=gvModel] tr:last-child").clone(true);
+        $("[id*=gvModel] tr").not($("[id*=gvModel] tr:first-child")).remove();
+        $.each(Model, function () {
+            $("td", row).eq(0).html('<input id="chkModel" onclick="GetModel(this);" type="checkbox"  />');
+            $("td", row).eq(1).html($(this).find("Model").text());
+            $("[id*=gvModel]").append(row);
+            row = $("[id*=gvModel] tr:last-child").clone(true);
+        });
+    }
+    $(".Model").click(function () {
+        $(".ModelDivv").addClass("visible");
+        BindCheck();
+    });
+    $(document).click(function (e) {
+        if (!$(event.target).closest(".ModelDivv,.Model").length) {
+            $(".ModelDivv").removeClass("visible");
+        }
+    });
+
+    var IssueD = $('#HideIssueDept').val();
+    function NextCondition() {
+        var result = Issue_Condition();
+        return result;
+    }
+
+    function openForm() {
+        $('#myForm').show();
+        $('#background').show();
+        $('#background').css('opacity', '0.5');
+    };
+    function closeForm() {
+        $('#myForm').hide();
+        $('#background').hide();
+    };
+
+    function ShowSearch() {
+        $('#div1').hide();
+        $('#div2').show();
+    }
+
+    $(document).ready(function () {
+        $('#grv_PIR tr').each(function () {
+            var Cancel = $(this).children('td:eq(2)').text();
+            if (Cancel == 'Cancel') {
+                $(this).children('td').css('background', '#696969');
+            }
+        });
+
+
+        //---------------------------------------------------------------
+        $(".Goto").click(function (event) {
+            document.getElementById("div1").style.display = 'none';
+            document.getElementById('div2').style.display = 'block';
+        });
+        $(".Backto").click(function (event) {
+            document.getElementById("div1").style.display = 'block';
+            document.getElementById('div2').style.display = 'none';
+        });
+        $("#grv_PIR tr:not(:first-child)").each(function () {
+            var status = $(this).find("td:nth-child(2)").text().trim();
+            if (status == 'Return to Issuer') {
+                $(this).find("td:nth-child(4) input").show();
+            }
+            else {
+                $(this).find("td:nth-child(4) input").hide();
+            }
+        });
+        $("#UpAttachOther").change(function () {
+            var file = document.getElementById('UpAttachOther');
+            var myCode = "";
+            var ds = file.value.split(",");
+            for (i in ds) {
+                let no = parseInt(i, 10);
+                name = ds[i].split('\\').pop().split('/').pop();
+                name = name.split(",")
+                name = "<p style='color: blue;padding:2 px;'>" + (no + 1) + ": " + name + "</p>";
+                myCode = myCode.concat(name);
+            }
+            if (file.files.length != 0) {
+                document.getElementById("upfile1").innerHTML = myCode;
+                $('#upfile1').show();
+            }
+            return myCode;
+        });
+        $("#grv_PIR td:nth-child(1) .TVPNoAction a").each(function () {
+            $(this).click(function () {
+                var Status = $(this).closest('tr').find("td:nth-child(2)").text().trim();
+
+            });
+        });
+        $(".breakword20").each(function () {
+            var t = $(this).text().trim();
+            if (t.length > 20) {
+                $(this).html(t.substring(0, 20) + '...');
+                $(this).attr('title', t);
+            }
+        });
+        $(".breakword30").each(function () {
+            var t = $(this).text().trim();
+            if (t.length > 30) {
+                $(this).html(t.substring(0, 30) + '...');
+                $(this).attr('title', t);
+            }
+        });
+        $(".breakword40").each(function () {
+            var t = $(this).text().trim();
+            if (t.length > 40) {
+                $(this).html(t.substring(0, 40) + '...');
+                $(this).attr('title', t);
+            }
+        });
+        $("#grv_PIR td:nth-child(12) a").each(function () {
+            $(this).click(function () {
+                var TVPNo = $(this).closest('tr').find("td:nth-child(1)").text().trim();
+                var href = "View/TVP/AttachDetail.aspx?TVPNo=" + TVPNo;
+                window.open(href, "Popup", 'toolbar=yes,menubar=yes,location = yes, scrollbars=yes,resizable=yes,width=800, height=585, left=300, top=100');
+                return false;
+            });
+        });
+    });
+</script>
